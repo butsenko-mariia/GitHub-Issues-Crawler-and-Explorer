@@ -29,7 +29,7 @@ public class Issue {
     private int issueNumber;
     @Column(nullable = false)
     private String title;
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String body;
     @Column(nullable = false)
     private IssueStatus state;
@@ -39,6 +39,6 @@ public class Issue {
     private LocalDate createdAt;
     @Column(name = "updated_at")
     private LocalDate updatedAt;
-    @Column(name = "ai_summary")
+    @Column(name = "ai_summary", columnDefinition = "TEXT")
     private String aiSummary;
 }
