@@ -18,8 +18,11 @@ public class Repository {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    @Column(name = "owner_id", nullable = false)
-    private UUID ownerId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private GitHubUser owner;
+
     @Column(nullable = false)
     private String name;
     @Column(nullable = false, unique = true)

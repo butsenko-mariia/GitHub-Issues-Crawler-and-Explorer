@@ -19,10 +19,15 @@ public class Issue {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    @Column(name = "repo_id", nullable = false)
-    private UUID repoId;
-    @Column(name = "author_id", nullable = false)
-    private UUID authorId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "repo_id", nullable = false)
+    private Repository repository;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false)
+    private GitHubUser author;
+
     @Column(name = "github_id", unique = true, nullable = false)
     private BigInteger githubId;
     @Column(name = "issue_number", nullable = false)
@@ -31,9 +36,12 @@ public class Issue {
     private String title;
     @Column(columnDefinition = "TEXT")
     private String body;
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private IssueStatus state;
-    @Column(name = "html_html", unique = true,  nullable = false)
+
+    @Column(name = "html_url", unique = true,  nullable = false)
     private String htmlUrl;
     @Column(name = "created_at", nullable = false)
     private LocalDate createdAt;

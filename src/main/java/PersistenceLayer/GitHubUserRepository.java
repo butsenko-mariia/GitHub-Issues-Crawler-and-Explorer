@@ -4,8 +4,12 @@ import PersistenceLayer.Models.GitHubUser;
 import PersistenceLayer.Models.Issue;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
+import java.util.Optional;
+import java.math.BigInteger;
 import java.util.UUID;
 
 @Repository
-public interface GitHubUserRepository extends JpaRepository<GitHubUser, UUID> {}
+public interface GitHubUserRepository extends JpaRepository<GitHubUser, UUID> {
+    Optional<GitHubUser> findByGithubId(BigInteger githubId);
+    Optional<GitHubUser> findByProfileUrl(String profileUrl);
+}
