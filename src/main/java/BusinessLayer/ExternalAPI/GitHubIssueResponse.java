@@ -23,6 +23,9 @@ public class GitHubIssueResponse {
     @JsonProperty("updated_at")
     private ZonedDateTime updatedAt;
 
+    @JsonProperty("pull_request")
+    private Object pullRequest;
+
     private GitHubUserResponse user;
 
     @Data
