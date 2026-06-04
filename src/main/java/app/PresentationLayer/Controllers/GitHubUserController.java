@@ -1,8 +1,8 @@
-package PresentationLayer.Controllers;
+package app.PresentationLayer.Controllers;
 
-import BusinessLayer.Services.GitHubUserService;
-import PersistenceLayer.Models.GitHubUser;
-import PresentationLayer.DTOs.GitHubUserDTO;
+import app.BusinessLayer.Services.GitHubUserService;
+import app.PersistenceLayer.Models.GitHubUser;
+import app.PresentationLayer.DTOs.GitHubUserDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

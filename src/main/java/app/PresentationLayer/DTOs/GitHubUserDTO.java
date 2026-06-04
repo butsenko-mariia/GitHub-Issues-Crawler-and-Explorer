@@ -1,4 +1,4 @@
-package PresentationLayer.DTOs;
+package app.PresentationLayer.DTOs;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

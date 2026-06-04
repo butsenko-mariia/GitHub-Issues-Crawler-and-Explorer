@@ -1,4 +1,4 @@
-package BusinessLayer.Exceptions;
+package app.BusinessLayer.Exceptions;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message) {

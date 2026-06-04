@@ -1,4 +1,4 @@
-package BusinessLayer.ExternalAPI;
+package app.BusinessLayer.ExternalAPI;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

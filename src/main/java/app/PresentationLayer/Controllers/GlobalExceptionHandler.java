@@ -1,6 +1,6 @@
-package PresentationLayer.Controllers;
+package app.PresentationLayer.Controllers;
 
-import BusinessLayer.Exceptions.ResourceNotFoundException;
+import app.BusinessLayer.Exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

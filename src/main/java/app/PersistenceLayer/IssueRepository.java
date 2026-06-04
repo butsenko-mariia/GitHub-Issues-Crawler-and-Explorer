@@ -1,7 +1,7 @@
-package PersistenceLayer;
+package app.PersistenceLayer;
 
-import PersistenceLayer.Enums.IssueStatus;
-import PersistenceLayer.Models.Issue;
+import app.PersistenceLayer.Enums.IssueStatus;
+import app.PersistenceLayer.Models.Issue;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

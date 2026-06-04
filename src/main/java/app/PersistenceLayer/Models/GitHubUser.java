@@ -1,4 +1,4 @@
-package PersistenceLayer.Models;
+package app.PersistenceLayer.Models;
 
 import jakarta.persistence.*;
 import lombok.*;
