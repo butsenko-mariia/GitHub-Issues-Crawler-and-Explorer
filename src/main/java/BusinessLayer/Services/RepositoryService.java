@@ -34,7 +34,7 @@ public class RepositoryService {
 
     public Repository update(UUID id, Repository details){
         Repository repository =  getById(id);
-        repository.setOwnerId(details.getOwnerId());
+        repository.setOwner(details.getOwner());
         repository.setName(details.getName());
         repository.setUrl(details.getUrl());
         repository.setTotalIssues(details.getTotalIssues());

@@ -8,8 +8,10 @@ import PersistenceLayer.Models.GitHubUser;
 import PersistenceLayer.Models.Issue;
 import PersistenceLayer.Models.Repository;
 import PersistenceLayer.RepositoryRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigInteger;
@@ -29,116 +31,143 @@ public class CrawlerService {
         this.repositoryRepo = repositoryRepo;
         this.issueRepo = issueRepo;
         this.userRepo = userRepo;
-        this.restTemplate = new RestTemplate(); // Інструмент для HTTP запитів
+        this.restTemplate = new RestTemplate();
     }
 
-    // Головний метод, який робить усю магію.
-    // @Transactional гарантує, що якщо щось зламається посеред процесу, база даних не запише напівпорожні дані.
     @Transactional
-    public Repository crawlRepository(String url) {
-        // 1. Витягуємо owner та repo з посилання (наприклад, з https://github.com/facebook/react)
+    public Repository addNewRepository(String url) {
+        if (repositoryRepo.findByUrl(url).isPresent()) {
+            throw new IllegalStateException("Цей репозиторій вже був доданий до системи.");
+        }
+        return processCrawling(url);
+    }
+
+    @Transactional
+    public Repository reCrawlRepository(String url) {
+        if (repositoryRepo.findByUrl(url).isEmpty()) {
+            throw new IllegalArgumentException("Репозиторій не знайдено. Спочатку додайте його.");
+        }
+        return processCrawling(url);
+    }
+
+    private Repository processCrawling(String url) {
+        if (url == null || !url.startsWith("https://github.com/")) {
+            throw new IllegalArgumentException("Недійсна URL-адреса. Формат має бути: https://github.com/owner/repo");
+        }
+
         String cleanUrl = url.replace("https://github.com/", "");
         String[] parts = cleanUrl.split("/");
         if (parts.length < 2) {
-            throw new IllegalArgumentException("Неправильний URL. Формат має бути: https://github.com/owner/repo");
+            throw new IllegalArgumentException("Недійсна URL-адреса. Не вдалося визначити власника та назву.");
         }
         String ownerName = parts[0];
         String repoName = parts[1];
 
-        // 2. Створюємо або дістаємо існуючого власника репозиторію
+        int totalIssuesCount = fetchRepositoryStats(ownerName, repoName);
+
         GitHubUser repoOwner = getOrCreateUserFromApi(ownerName);
-
-        // 3. Дістаємо загальну статистику репо з GitHub API (щоб дізнатися totalIssues)
-        String repoApiUrl = "https://api.github.com/repos/" + ownerName + "/" + repoName;
-        int totalIssuesCount = 0;
-        try {
-            Map<String, Object> repoData = restTemplate.getForObject(repoApiUrl, Map.class);
-            if (repoData != null && repoData.containsKey("open_issues_count")) {
-                totalIssuesCount = (Integer) repoData.get("open_issues_count");
-            }
-        } catch (Exception e) {
-            System.out.println("Не вдалося отримати статистику репозиторію: " + e.getMessage());
-        }
-
-        // 4. Шукаємо цей репозиторій в нашій БД. Якщо немає — створюємо новий.
-        // (Тут передбачається, що в RepositoryRepository ти додала метод Optional<Repository> findByUrl(String url);)
-        Repository repository = repositoryRepo.findByUrl(url)
-                .orElse(new Repository());
-
+        Repository repository = repositoryRepo.findByUrl(url).orElse(new Repository());
         repository.setUrl(url);
         repository.setName(repoName);
-        repository.setOwner(repoOwner); // Використовуємо об'єкт (ManyToOne), як ми обговорювали раніше!
+        repository.setOwner(repoOwner);
         repository.setTotalIssues(totalIssuesCount);
         repository.setCrawledAt(LocalDate.now());
+        repository = repositoryRepo.save(repository);
 
-        repositoryRepo.save(repository);
+        int page = 1;
+        boolean hasMoreIssues = true;
 
-        // 5. Завантажуємо самі issues (беремо перші 100 штук для прикладу)
-        String issuesApiUrl = "https://api.github.com/repos/" + ownerName + "/" + repoName + "/issues?state=all&per_page=100";
-        GitHubIssueResponse[] issuesFromApi = restTemplate.getForObject(issuesApiUrl, GitHubIssueResponse[].class);
+        while (hasMoreIssues) {
+            String issuesApiUrl = String.format("https://api.github.com/repos/%s/%s/issues?state=all&per_page=100&page=%d", ownerName, repoName, page);
 
-        if (issuesFromApi != null) {
-            for (GitHubIssueResponse apiIssue : issuesFromApi) {
-                // GitHub віддає Pull Requests разом з Issues. Якщо є ключ pull_request, це не ішю, пропускаємо.
-                // (Для спрощення зараз обробляємо все, але май на увазі)
+            try {
+                GitHubIssueResponse[] issuesFromApi = restTemplate.getForObject(issuesApiUrl, GitHubIssueResponse[].class);
 
-                // Знаходимо або створюємо автора тікета
-                GitHubUser author = getOrCreateUser(apiIssue.getUser());
-
-                // 6. Перевірка на дублікати (Вимога 8: "re-crawl without creating duplicate issues")
-                // (Тут треба додати метод Optional<Issue> findByGithubId(BigInteger githubId) у IssueRepository)
-                Issue issue = issueRepo.findByGithubId(apiIssue.getId())
-                        .orElse(new Issue());
-
-                issue.setGithubId(apiIssue.getId());
-                issue.setIssueNumber(apiIssue.getNumber());
-                issue.setTitle(apiIssue.getTitle());
-                issue.setBody(apiIssue.getBody());
-                issue.setState(IssueStatus.valueOf(apiIssue.getState().toUpperCase()));
-                issue.setHtmlUrl(apiIssue.getHtmlUrl());
-
-                // Конвертуємо ZonedDateTime від GitHub у твій LocalDate
-                issue.setCreatedAt(apiIssue.getCreatedAt().toLocalDate());
-                if (apiIssue.getUpdatedAt() != null) {
-                    issue.setUpdatedAt(apiIssue.getUpdatedAt().toLocalDate());
+                if (issuesFromApi == null || issuesFromApi.length == 0) {
+                    hasMoreIssues = false;
+                    break;
                 }
 
-                issue.setAuthor(author); // ManyToOne зв'язок
-                issue.setRepository(repository); // ManyToOne зв'язок
+                for (GitHubIssueResponse apiIssue : issuesFromApi) {
+                    if (apiIssue.getPullRequest() != null) {
+                        continue;
+                    }
 
-                issueRepo.save(issue);
+                    saveIssue(apiIssue, repository);
+                }
+                page++;
+
+            } catch (HttpClientErrorException e) {
+                handleGitHubApiError(e);
+            } catch (Exception e) {
+                throw new RuntimeException("Дані не вдалося зберегти: " + e.getMessage());
             }
         }
 
         return repository;
     }
 
-    // --- Допоміжні методи ---
+    private void saveIssue(GitHubIssueResponse apiIssue, Repository repository) {
+        GitHubUser author = getOrCreateUser(apiIssue.getUser());
+
+        Issue issue = issueRepo.findByGithubId(apiIssue.getId()).orElse(new Issue());
+        issue.setGithubId(apiIssue.getId());
+        issue.setIssueNumber(apiIssue.getNumber());
+        issue.setTitle(apiIssue.getTitle());
+        String body = apiIssue.getBody() != null ? apiIssue.getBody() : "";
+        issue.setBody(body.length() > 5000 ? body.substring(0, 5000) + "..." : body);
+        issue.setState(IssueStatus.valueOf(apiIssue.getState().toUpperCase()));
+        issue.setHtmlUrl(apiIssue.getHtmlUrl());
+        issue.setCreatedAt(apiIssue.getCreatedAt().toLocalDate());
+        if (apiIssue.getUpdatedAt() != null) {
+            issue.setUpdatedAt(apiIssue.getUpdatedAt().toLocalDate());
+        }
+        issue.setAuthor(author);
+        issue.setRepository(repository);
+
+        issueRepo.save(issue);
+    }
+
+    private int fetchRepositoryStats(String owner, String repo) {
+        String repoApiUrl = "https://api.github.com/repos/" + owner + "/" + repo;
+        try {
+            Map<String, Object> repoData = restTemplate.getForObject(repoApiUrl, Map.class);
+            if (repoData != null && repoData.containsKey("open_issues_count")) {
+                return (Integer) repoData.get("open_issues_count");
+            }
+        } catch (HttpClientErrorException e) {
+            handleGitHubApiError(e);
+        }
+        return 0;
+    }
+
+    private void handleGitHubApiError(HttpClientErrorException e) {
+        if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+            throw new IllegalArgumentException("Репозиторій не існує, є приватним або недоступним.");
+        } else if (e.getStatusCode() == HttpStatus.FORBIDDEN || e.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
+            throw new RuntimeException("Досягнуто ліміту запитів (rate limit) GitHub. Спробуйте пізніше.");
+        } else {
+            throw new RuntimeException("Запит до GitHub завершився невдачею: " + e.getMessage());
+        }
+    }
 
     private GitHubUser getOrCreateUser(GitHubIssueResponse.GitHubUserResponse apiUser) {
-        // Шукаємо юзера в базі
-        Optional<GitHubUser> existingUser = userRepo.findByGithubId(apiUser.getId());
-        if (existingUser.isPresent()) {
-            return existingUser.get();
-        }
-
-        // Якщо немає - створюємо
-        GitHubUser newUser = new GitHubUser();
-        newUser.setGithubId(apiUser.getId());
-        newUser.setLogin(apiUser.getLogin());
-        newUser.setName(apiUser.getLogin()); // GitHub Issue API не віддає повне ім'я, використовуємо логін
-        newUser.setProfileUrl(apiUser.getHtmlUrl());
-        return userRepo.save(newUser);
+        if (apiUser == null) return null;
+        return userRepo.findByGithubId(apiUser.getId()).orElseGet(() -> {
+            GitHubUser newUser = new GitHubUser();
+            newUser.setGithubId(apiUser.getId());
+            newUser.setLogin(apiUser.getLogin());
+            newUser.setName(apiUser.getLogin());
+            newUser.setProfileUrl(apiUser.getHtmlUrl());
+            return userRepo.save(newUser);
+        });
     }
 
     private GitHubUser getOrCreateUserFromApi(String username) {
-        // Це спрощений метод для створення власника репозиторію.
-        // В ідеалі теж треба зробити запит до https://api.github.com/users/{username}
-        // Але для тесту можна створити базовий об'єкт.
         String profileUrl = "https://github.com/" + username;
         return userRepo.findByProfileUrl(profileUrl).orElseGet(() -> {
             GitHubUser user = new GitHubUser();
-            user.setGithubId(BigInteger.valueOf(username.hashCode())); // Тимчасовий ID, бо ми не робили запит
+            user.setGithubId(BigInteger.valueOf(username.hashCode()));
             user.setLogin(username);
             user.setName(username);
             user.setProfileUrl(profileUrl);

@@ -36,7 +36,7 @@ public class IssueService {
 
     public Issue update(UUID id,  Issue details){
         Issue issue =  getById(id);
-        issue.setAuthorId(details.getAuthorId());
+        issue.setAuthor(details.getAuthor());
         issue.setGithubId( details.getGithubId() );
         issue.setIssueNumber( details.getIssueNumber() );
         issue.setTitle( details.getTitle() );
@@ -52,5 +52,22 @@ public class IssueService {
 
     public void delete(Issue issue){
         issueRepo.delete(issue);
+    }
+
+    public List<Issue> getIssuesByRepository(UUID repoId) {
+        return issueRepo.findByRepositoryId(repoId);
+    }
+
+    public List<Issue> getIssuesByRepositoryAndStatus(UUID repoId, IssueStatus status) {
+        return issueRepo.findByRepositoryIdAndState(repoId, status);
+    }
+
+    public String getMostActiveAuthor(UUID repoId) {
+        return issueRepo.findTopAuthorLoginByRepositoryId(repoId)
+                .orElse("Авторів не знайдено");
+    }
+
+    public long getUniqueAuthorsCount(UUID repoId) {
+        return issueRepo.countUniqueAuthorsByRepositoryId(repoId);
     }
 }
