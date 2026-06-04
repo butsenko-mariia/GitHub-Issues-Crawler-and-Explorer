@@ -27,15 +27,3 @@ public class GitHubUser {
     private String profileUrl;
 }
 
-
-//public class Book {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.UUID)
-//    private UUID id;
-//
-//    private String title;
-//    private String author;
-//
-//    @Enumerated(EnumType.STRING)
-//    private BookStatus status;
-//}

@@ -1,10 +1,12 @@
 package PersistenceLayer;
 
 import PersistenceLayer.Models.Issue;
+import PersistenceLayer.Models.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
+import java.util.Optional;
 import java.util.UUID;
 
-@Repository
-public interface RepositoryRepository extends JpaRepository<Repository, UUID> {}
+@org.springframework.stereotype.Repository
+public interface RepositoryRepository extends JpaRepository<Repository, UUID> {
+    Optional<Repository> findByUrl(String url);
+}
