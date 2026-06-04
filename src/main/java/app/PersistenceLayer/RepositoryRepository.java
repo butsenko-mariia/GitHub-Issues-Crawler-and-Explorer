@@ -1,7 +1,6 @@
-package PersistenceLayer;
+package app.PersistenceLayer;
 
-import PersistenceLayer.Models.Issue;
-import PersistenceLayer.Models.Repository;
+import app.PersistenceLayer.Models.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 import java.util.UUID;

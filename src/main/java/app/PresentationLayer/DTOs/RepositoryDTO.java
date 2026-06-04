@@ -1,6 +1,5 @@
-package PresentationLayer.DTOs;
+package app.PresentationLayer.DTOs;
 
-import PersistenceLayer.Enums.IssueStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -8,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.UUID;
 

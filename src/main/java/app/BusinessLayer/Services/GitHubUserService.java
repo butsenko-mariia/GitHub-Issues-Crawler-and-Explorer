@@ -1,8 +1,8 @@
-package BusinessLayer.Services;
+package app.BusinessLayer.Services;
 
-import BusinessLayer.Exceptions.ResourceNotFoundException;
-import PersistenceLayer.GitHubUserRepository;
-import PersistenceLayer.Models.GitHubUser;
+import app.BusinessLayer.Exceptions.ResourceNotFoundException;
+import app.PersistenceLayer.GitHubUserRepository;
+import app.PersistenceLayer.Models.GitHubUser;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

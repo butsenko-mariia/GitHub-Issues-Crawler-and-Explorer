@@ -1,9 +1,9 @@
-package PresentationLayer.Controllers;
+package app.PresentationLayer.Controllers;
 
-import BusinessLayer.Services.AiService;
-import BusinessLayer.Services.IssueService;
-import PersistenceLayer.Models.Issue;
-import PresentationLayer.DTOs.IssueDTO;
+import app.BusinessLayer.Services.AiService;
+import app.BusinessLayer.Services.IssueService;
+import app.PersistenceLayer.Models.Issue;
+import app.PresentationLayer.DTOs.IssueDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

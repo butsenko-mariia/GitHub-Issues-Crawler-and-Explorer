@@ -1,7 +1,6 @@
-package PersistenceLayer;
+package app.PersistenceLayer;
 
-import PersistenceLayer.Models.GitHubUser;
-import PersistenceLayer.Models.Issue;
+import app.PersistenceLayer.Models.GitHubUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;

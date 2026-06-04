@@ -1,13 +1,13 @@
-package BusinessLayer.Services;
+package app.BusinessLayer.Services;
 
-import BusinessLayer.ExternalAPI.GitHubIssueResponse;
-import PersistenceLayer.Enums.IssueStatus;
-import PersistenceLayer.GitHubUserRepository;
-import PersistenceLayer.IssueRepository;
-import PersistenceLayer.Models.GitHubUser;
-import PersistenceLayer.Models.Issue;
-import PersistenceLayer.Models.Repository;
-import PersistenceLayer.RepositoryRepository;
+import app.BusinessLayer.ExternalAPI.GitHubIssueResponse;
+import app.PersistenceLayer.Enums.IssueStatus;
+import app.PersistenceLayer.GitHubUserRepository;
+import app.PersistenceLayer.IssueRepository;
+import app.PersistenceLayer.Models.GitHubUser;
+import app.PersistenceLayer.Models.Issue;
+import app.PersistenceLayer.Models.Repository;
+import app.PersistenceLayer.RepositoryRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +17,6 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class CrawlerService {

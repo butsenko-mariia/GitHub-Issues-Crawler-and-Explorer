@@ -1,4 +1,4 @@
-package PersistenceLayer.Enums;
+package app.PersistenceLayer.Enums;
 
 public enum IssueStatus {
     OPEN,

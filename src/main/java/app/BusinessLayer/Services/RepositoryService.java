@@ -1,14 +1,10 @@
-package BusinessLayer.Services;
+package app.BusinessLayer.Services;
 
-import BusinessLayer.Exceptions.ResourceNotFoundException;
-import PersistenceLayer.GitHubUserRepository;
-import PersistenceLayer.Models.GitHubUser;
-import PersistenceLayer.Models.Repository;
-import PersistenceLayer.RepositoryRepository;
-import jakarta.persistence.Column;
+import app.BusinessLayer.Exceptions.ResourceNotFoundException;
+import app.PersistenceLayer.Models.Repository;
+import app.PersistenceLayer.RepositoryRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 

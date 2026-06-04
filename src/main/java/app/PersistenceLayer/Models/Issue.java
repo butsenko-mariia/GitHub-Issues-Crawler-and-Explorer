@@ -1,6 +1,6 @@
-package PersistenceLayer.Models;
+package app.PersistenceLayer.Models;
 
-import PersistenceLayer.Enums.IssueStatus;
+import app.PersistenceLayer.Enums.IssueStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

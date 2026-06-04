@@ -1,16 +1,11 @@
-package BusinessLayer.Services;
+package app.BusinessLayer.Services;
 
-import BusinessLayer.Exceptions.ResourceNotFoundException;
-import PersistenceLayer.Enums.IssueStatus;
-import PersistenceLayer.GitHubUserRepository;
-import PersistenceLayer.IssueRepository;
-import PersistenceLayer.Models.GitHubUser;
-import PersistenceLayer.Models.Issue;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import app.BusinessLayer.Exceptions.ResourceNotFoundException;
+import app.PersistenceLayer.Enums.IssueStatus;
+import app.PersistenceLayer.IssueRepository;
+import app.PersistenceLayer.Models.Issue;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 

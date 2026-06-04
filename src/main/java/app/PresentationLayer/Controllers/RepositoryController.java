@@ -1,15 +1,15 @@
-package PresentationLayer.Controllers;
+package app.PresentationLayer.Controllers;
 
-import BusinessLayer.Services.CrawlerService;
-import BusinessLayer.Services.IssueService;
-import BusinessLayer.Services.RepositoryService;
-import PersistenceLayer.Enums.IssueStatus;
-import PersistenceLayer.Models.GitHubUser;
-import PersistenceLayer.Models.Issue;
-import PersistenceLayer.Models.Repository;
-import PresentationLayer.DTOs.GitHubUserDTO;
-import PresentationLayer.DTOs.IssueDTO;
-import PresentationLayer.DTOs.RepositoryDTO;
+import app.BusinessLayer.Services.CrawlerService;
+import app.BusinessLayer.Services.IssueService;
+import app.BusinessLayer.Services.RepositoryService;
+import app.PersistenceLayer.Enums.IssueStatus;
+import app.PersistenceLayer.Models.GitHubUser;
+import app.PersistenceLayer.Models.Issue;
+import app.PersistenceLayer.Models.Repository;
+import app.PresentationLayer.DTOs.GitHubUserDTO;
+import app.PresentationLayer.DTOs.IssueDTO;
+import app.PresentationLayer.DTOs.RepositoryDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

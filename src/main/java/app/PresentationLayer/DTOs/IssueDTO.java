@@ -1,6 +1,6 @@
-package PresentationLayer.DTOs;
+package app.PresentationLayer.DTOs;
 
-import PersistenceLayer.Enums.IssueStatus;
+import app.PersistenceLayer.Enums.IssueStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
