@@ -7,26 +7,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigInteger;
-import java.util.UUID;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class GitHubUserDTO {
-    private UUID id;
+public class CrawlProgressDTO {
+    private String status;
 
-    @JsonProperty("github_id")
-    private BigInteger githubId;
+    @JsonProperty("crawled_count")
+    private int crawledCount;
 
-    private String login;
-    private String name;
+    @JsonProperty("current_page")
+    private int currentPage;
 
-    @JsonProperty("profile_url")
-    private String profileUrl;
-
-    @JsonProperty("issues_count")
-    private Long issuesCount;
+    private String message;
 }

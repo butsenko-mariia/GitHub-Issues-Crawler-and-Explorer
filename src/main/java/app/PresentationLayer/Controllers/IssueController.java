@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/issues")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173")
 public class IssueController {
 
     private final IssueService issueService;
@@ -33,12 +33,13 @@ public class IssueController {
                 .githubId(issue.getGithubId())
                 .issueNumber(issue.getIssueNumber())
                 .title(issue.getTitle())
-                .body(issue.getBody()) // ТУТ передаємо повний текст тікета
+                .body(issue.getBody())
                 .state(issue.getState())
                 .htmlUrl(issue.getHtmlUrl())
                 .createdAt(issue.getCreatedAt())
                 .updatedAt(issue.getUpdatedAt())
                 .aiSummary(issue.getAiSummary())
+                .authorLogin(issue.getAuthor() != null ? issue.getAuthor().getLogin() : "Невідомо")
                 .build();
 
         return ResponseEntity.ok(dto);
@@ -48,14 +49,11 @@ public class IssueController {
     public ResponseEntity<IssueDTO> summarizeIssue(@PathVariable UUID id) {
         Issue issue = issueService.getById(id);
 
-        // Викликаємо СПРАВЖНІЙ ШІ, передаючи заголовок та опис тікета
         String realSummary = aiService.generateSummary(issue.getTitle(), issue.getBody());
 
-        // Зберігаємо згенерований підсумок в базу даних (Вимога Бонус 4)
         issue.setAiSummary(realSummary);
         issueService.update(issue.getId(), issue);
 
-        // Повертаємо оновлений DTO користувачу
         IssueDTO dto = IssueDTO.builder()
                 .id(issue.getId())
                 .aiSummary(issue.getAiSummary())

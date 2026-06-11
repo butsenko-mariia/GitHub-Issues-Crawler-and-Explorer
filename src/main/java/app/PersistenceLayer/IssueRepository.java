@@ -14,13 +14,17 @@ import java.util.UUID;
 
 @Repository
 public interface IssueRepository extends JpaRepository<Issue, UUID> {
+
     Optional<Issue> findByGithubId(BigInteger githubId);
 
     List<Issue> findByRepositoryId(UUID repositoryId);
 
     List<Issue> findByRepositoryIdAndState(UUID repositoryId, IssueStatus state);
 
-    @Query("SELECT i.author.login FROM Issue i WHERE i.repository.id = :repoId GROUP BY i.author.id ORDER BY COUNT(i) DESC LIMIT 1")
+    long countByRepositoryId(UUID repositoryId);
+
+    @Query("SELECT i.author.login FROM Issue i WHERE i.repository.id = :repoId " +
+            "GROUP BY i.author.id ORDER BY COUNT(i) DESC LIMIT 1")
     Optional<String> findTopAuthorLoginByRepositoryId(@Param("repoId") UUID repoId);
 
     @Query("SELECT COUNT(DISTINCT i.author.id) FROM Issue i WHERE i.repository.id = :repoId")
