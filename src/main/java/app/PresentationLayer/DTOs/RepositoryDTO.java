@@ -17,12 +17,22 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RepositoryDTO {
     private UUID id;
+
     @JsonProperty("owner_id")
     private UUID ownerId;
+
     private String name;
     private String url;
+
     @JsonProperty("total_issues")
     private int totalIssues;
+
+    @JsonProperty("crawled_issues_count")
+    private long crawledIssuesCount;
+
+    @JsonProperty("unique_authors_count")
+    private long uniqueAuthorsCount;
+
     @JsonProperty("crawled_at")
     private LocalDate crawledAt;
 }

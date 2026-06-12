@@ -38,4 +38,6 @@ public class IssueDTO {
     private LocalDate updatedAt;
     @JsonProperty("ai_summary")
     private String aiSummary;
+    @JsonProperty("author_login")
+    private String authorLogin;
 }
